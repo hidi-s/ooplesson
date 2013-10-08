@@ -1,0 +1,10 @@
+T T T T T T T T T P P P P P
+T . R . . B . . . P G . . P
+T R . R . . R . . P . . . P
+T . . . . . . . . P . Z . P
+T . . . . . . . . P P . P P
+T . B . . . . . . . . . . T
+T . . . . . . . M . . . . T
+T . . . . . R . . . R . . T
+T . R . . . . . . . . . . T
+T T T T T T T T T T T T T T

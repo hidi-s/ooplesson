@@ -16,3 +16,4 @@ class GameElement(object):
 
     def update(self, dt):
         pass
+level = {"lvl" : 0, 0: "giraffe", 1: "monkey", 2: "pig" }

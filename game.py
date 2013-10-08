@@ -43,7 +43,7 @@ class Character(GameElement):
     def talk(self, player, other):
         pass
 
-level = {"lvl" : 0, 0: "giraffe", 1: "monkey", 2: "pig" }
+
 
 class Zoo_Keeper(GameElement):
     IMAGE = "Boy"
@@ -53,14 +53,17 @@ class Zoo_Keeper(GameElement):
 
     def interact(self, creature):
         if len(PLAYER.animals) == 0:
-            GAME_BOARD.draw_msg("I'm missing my %s! Please help me find him!" %level[level["lvl"]])
-            giraffe = Giraffe("beh")
-            GAME_BOARD.register(giraffe)
-            GAME_BOARD.set_el(5, 5, giraffe)
+            GAME_BOARD.draw_msg("I'm missing my %s! Please help me find him!" %core.level[core.level["lvl"]])
+            if core.level[core.level["lvl"]] == "giraffe":
+                create_map("map1.txt")
+            if core.level[core.level["lvl"]] == "monkey":
+                create_map("map2.txt")
         elif len(PLAYER.animals) == 1:
-            GAME_BOARD.draw_msg("I see you've found my %s. Please press 'R' to return him to the pen."  %level[level["lvl"]])
+            GAME_BOARD.draw_msg("I see you've found my %s."  %core.level[core.level["lvl"]])
             PLAYER.animals.pop(0) 
-            level["lvl"] += 1 
+            if core.level[core.level["lvl"]] == "giraffe":
+                create_map("map1.5.txt")
+            core.level["lvl"] += 1 
 
 
 class Animal(GameElement):
@@ -101,8 +104,13 @@ class Monkey(Animal):
     def __init__(self, noise, animal = "Monkey"):
         self.noise = noise 
      
+class Banana(GameElement):
+    IMAGE = "Banana"
+    SOLID = False
 
-
+    def interact(self, player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You just acquired a %s! You have %d %ss!" % (self.name, len(player.inventory), self.name))
 
 class Tofu(Animal):
     pass
@@ -112,80 +120,25 @@ class Boundary(GameElement):
     def __init__(self, image):
         self.IMAGE = image
 
-class Gem(GameElement):
-    IMAGE = "BlueGem"
-    SOLID = False
-
-    def interact(self, player):
-        player.inventory.append(self)
-        GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
+class Tree(Boundary):
+    IMAGE = "ShortTree"
+    def __init__(self):
+        pass
 
 ####   End class definitions    ####
 
 def initialize():
     """Put game initialization code here"""
-    # rock = Rock()
-    # GAME_BOARD.register(rock)
-    # GAME_BOARD.set_el(2, 1, rock) #starts at top left, goes right first, then down
-    # print "The rock is at", (rock.x, rock.y)
-
-
-    for i in range(14):
-        wall = Boundary("Wall")
-        pen = Boundary("Pen")
-        GAME_BOARD.register(wall)
-        GAME_BOARD.register(pen)
-        if i < 9:
-            GAME_BOARD.set_el(i, 0, wall)
-        else:
-            GAME_BOARD.set_el(i, 0, pen)
-        GAME_BOARD.set_el(i, 9, wall)
-    for i in range(10):
-        wall = Boundary("Wall")
-        pen = Boundary("Pen")
-        GAME_BOARD.register(wall)
-        GAME_BOARD.register(pen)
-        if i < 5:
-            GAME_BOARD.set_el(13, i, pen)
-        else:
-            GAME_BOARD.set_el(13, i, wall)
-        GAME_BOARD.set_el(0, i, wall)
-    for i in range(1, 5):
-        pen = Boundary("Pen")
-        GAME_BOARD.register(pen)
-        GAME_BOARD.set_el(9, i, pen)
-        GAME_BOARD.set_el(10, 4, pen)
-        GAME_BOARD.set_el(12, 4, pen)
-
-
-    rock_positions = [
-            (2,1),
-            (1,2),
-            (3,2),
-            (8,3),
-            (10, 7)
-        ]
-    rocks = []
-    for pos in rock_positions:
-        rock = Rock()
-        GAME_BOARD.register(rock)
-        GAME_BOARD.set_el(pos[0], pos[1], rock)
-        rocks.append(rock)
-
-    rocks[-1].SOLID = False
-    
-    for rock in rocks:
-        print rock
+    create_map("map0.txt")
 
     global PLAYER
     PLAYER = Character()
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(2, 2, PLAYER)
-    print PLAYER
 
-    keeper = Zoo_Keeper()
-    GAME_BOARD.register(keeper)
-    GAME_BOARD.set_el(11, 3, keeper)
+    # keeper = Zoo_Keeper()
+    # GAME_BOARD.register(keeper)
+    # GAME_BOARD.set_el(11, 3, keeper)
 
     GAME_BOARD.draw_msg("I wonder what happens if I talk to someone. I see a baby animal specialist over there! He looks worried....")
 
@@ -206,6 +159,8 @@ def keyboard_handler():
         direction = "down"
     if KEYBOARD[key.RIGHT]:
         direction = "right"
+    # if KEYBOARD[key.R]:
+    #     pass
 
     if direction: 
         next_location = PLAYER.next_pos(direction)
@@ -221,3 +176,55 @@ def keyboard_handler():
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
 
+def create_map(textfile):
+    map_positions = []
+
+    map0 = open(textfile)
+    rows = map0.read().split("\n")
+    for line in rows:
+        items = line.split(" ")
+        map_positions.append(items)
+    for x in range(len(items)):
+        for y in range(len(rows)):
+            # print map_positions[y]
+            if ord(map_positions[y][x]) == ord("R"):
+                rock = Rock()
+                GAME_BOARD.register(rock)
+                GAME_BOARD.set_el(x, y, rock)
+                print rock
+            elif ord(map_positions[y][x]) == ord("P"): 
+                pen = Boundary("Pen")
+                GAME_BOARD.register(pen)
+                GAME_BOARD.set_el(x, y, pen)
+                print pen
+            elif ord(map_positions[y][x]) == ord("Z"):
+                keeper = Zoo_Keeper()
+                GAME_BOARD.register(keeper)
+                GAME_BOARD.set_el(x, y, keeper)
+            elif ord(map_positions[y][x]) == ord("G"):
+                giraffe = Giraffe("Beh!")
+                GAME_BOARD.register(giraffe)
+                GAME_BOARD.set_el(x, y, giraffe)
+            elif ord(map_positions[y][x]) == ord("-") or ord(map_positions[y][x]) == ord("|"):
+                wall = Boundary("Wall")
+                GAME_BOARD.register(wall)
+                GAME_BOARD.set_el(x, y, wall)
+            elif ord(map_positions[y][x]) == ord("B"):
+                banana = Banana()
+                GAME_BOARD.register(banana)
+                GAME_BOARD.set_el(x, y, banana)
+            elif ord(map_positions[y][x]) == ord("M"):
+                monkey = Monkey("eeek! eeek!")
+                GAME_BOARD.register(monkey)
+                GAME_BOARD.set_el(x, y, monkey)
+            elif ord(map_positions[y][x]) == ord("T"):
+                tree = Tree()
+                GAME_BOARD.register(tree)
+                GAME_BOARD.set_el(x, y, tree)
+            # elif ord(map_positions[y][x]) == ord("."):
+            #     PLAYER = Character()
+            #     GAME_BOARD.register(PLAYER)
+            #     GAME_BOARD.set_el(PLAYER.x, PLAYER.y, PLAYER)
+    # global PLAYER
+    # GAME_BOARD.register(PLAYER)
+    # GAME_BOARD.set_el(PLAYER.x, PLAYER.y, PLAYER)
