@@ -41,7 +41,9 @@ def setup_images():
             "Horns": "Character Horn Girl.png",
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
-            "Pig": "Character Cat Girl.png"
+            "Pig": "Character Cat Girl.png", 
+            "Pen" : "Dirt Block.png"
+
             }
 
     for k,v in filenames.items():
@@ -234,6 +236,9 @@ def run():
     pyglet.clock.schedule_interval(update, 1/10.)
     game.initialize()
     pyglet.app.run()
+
+    while (game.PLAYER.x, game.PLAYER.y) == (11,3):
+        game.return_animal(game.giraffe)
 
 class UpdateWrapper(object):
     def __init__(self, fn):

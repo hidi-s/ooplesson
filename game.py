@@ -25,6 +25,7 @@ class Character(GameElement):
     def __init__(self):
         GameElement.__init__(self)
         self.inventory = []
+        self.animals = []
 
 
     def next_pos(self, direction):
@@ -59,21 +60,23 @@ class Pig(Animal):
 
 class Giraffe(Animal):
     IMAGE = "Pig"
-    SOLID = True
+    SOLID = False
 
     def __init__(self, noise, animal = "pig"):
         self.noise = noise
 
     def interact(self, player):
-        player.inventory.append(self)
+        player.animals.append(self)
         GAME_BOARD.draw_msg("You just found our giraffe. Please return him to the baby animal specialist!")
+
 
 class Tofu(Animal):
     pass
 
 class Boundary(GameElement):
-    IMAGE = "Wall"
     SOLID = True
+    def __init__(self, image):
+        self.IMAGE = image
 
 class Gem(GameElement):
     IMAGE = "BlueGem"
@@ -94,16 +97,21 @@ def initialize():
 
 
     for i in range(14):
-        wall = Boundary()
+        wall = Boundary("Wall")
         GAME_BOARD.register(wall)
         GAME_BOARD.set_el(i, 0, wall)
         GAME_BOARD.set_el(i, 9, wall)
     for i in range(10):
-        wall = Boundary()
+        wall = Boundary("Wall")
         GAME_BOARD.register(wall)
         GAME_BOARD.set_el(0, i, wall)
         GAME_BOARD.set_el(13, i, wall)
-
+    for i in range(1, 5):
+        pen = Boundary("Pen")
+        GAME_BOARD.register(pen)
+        GAME_BOARD.set_el(9, i, pen)
+        GAME_BOARD.set_el(10, 4, pen)
+        GAME_BOARD.set_el(12, 4, pen)
 
 
     rock_positions = [
@@ -166,3 +174,8 @@ def keyboard_handler():
         if existing_el is None or not existing_el.SOLID:
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
+
+def return_animal(creature):
+    GAME_BOARD.draw_msg("You are almost done. Press \'Enter\' or \'Return\' to place %s back in the pen" % creature)
+    if KEYBOARD[key.ENTER]:
+        GAME_BOARD.set_el(PLAYER.x - 1, PLAYER.y, creature)
