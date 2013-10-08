@@ -42,8 +42,8 @@ def setup_images():
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
             "Pig": "Character Cat Girl.png", 
-            "Pen" : "Dirt Block.png"
-
+            "Pen" : "Dirt Block.png",
+            "Giraffe": "giraffe.png"   
             }
 
     for k,v in filenames.items():
@@ -128,8 +128,12 @@ class Board(object):
 
     def check_bounds(self, x, y):
         if not (0 <= x < self.width):
+            # GAME_BOARD.set_el(PLAYER.x, PLAYER.y, PLAYER)
+            # GAME_BOARD.draw_msg("You can't go that way!")
             raise IndexError("%r is out of bounds of the board width: %d"%(x, self.width))
         if not (0 <= y < self.height):
+            # GAME_BOARD.set_el(PLAYER.x, PLAYER.y, PLAYER)
+            # GAME_BOARD.draw_msg("You can't go that way!")
             raise IndexError("%r is out of bounds of the board height: %d"%(y, self.width))
 
     def get_el(self, x, y):

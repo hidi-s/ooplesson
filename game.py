@@ -39,8 +39,28 @@ class Character(GameElement):
             return (self.x+1, self.y)
         return None
 
+
     def talk(self, player, other):
         pass
+
+level = {"lvl" : 0, 0: "giraffe", 1: "monkey", 2: "pig" }
+
+class Zoo_Keeper(GameElement):
+    IMAGE = "Boy"
+    SOLID = True 
+    def __init__(self):
+        GameElement.__init__(self)
+
+    def interact(self, creature):
+        if len(PLAYER.animals) == 0:
+            GAME_BOARD.draw_msg("I'm missing my %s! Please help me find him!" %level[level["lvl"]])
+            giraffe = Giraffe("beh")
+            GAME_BOARD.register(giraffe)
+            GAME_BOARD.set_el(5, 5, giraffe)
+        elif len(PLAYER.animals) == 1:
+            GAME_BOARD.draw_msg("I see you've found my %s. Please press 'R' to return him to the pen."  %level[level["lvl"]])
+            PLAYER.animals.pop(0) 
+            level["lvl"] += 1 
 
 
 class Animal(GameElement):
@@ -51,6 +71,15 @@ class Animal(GameElement):
         GAME_BOARD.draw_msg("\"%s\", says the %s." % noise, animal)
         pass
 
+    def interact(self, PLAYER):
+        # GAME_BOARD.draw_msg("You are almost done. Press \'Enter\' or \'Return\' to place %s back in the pen" % creature)
+        # if KEYBOARD[key.ENTER]:            
+        #     GAME_BOARD.set_el(PLAYER.x - 1, PLAYER.y, creature)
+        PLAYER.animals.append(self)
+        GAME_BOARD.draw_msg("You just found our giraffe. Please return him to the baby animal specialist!")
+
+    # def interact(gate)
+
 class Pig(Animal):
     IMAGE = "Pig"
     SOLID = True
@@ -59,15 +88,20 @@ class Pig(Animal):
         self.noise = noise
 
 class Giraffe(Animal):
-    IMAGE = "Pig"
+    IMAGE = "Giraffe"
     SOLID = False
 
-    def __init__(self, noise, animal = "pig"):
+    def __init__(self, noise, animal = "Giraffe"):
         self.noise = noise
 
-    def interact(self, player):
-        player.animals.append(self)
-        GAME_BOARD.draw_msg("You just found our giraffe. Please return him to the baby animal specialist!")
+class Monkey(Animal):
+    IMAGE = "Monkey"
+    SOLID = True
+
+    def __init__(self, noise, animal = "Monkey"):
+        self.noise = noise 
+     
+
 
 
 class Tofu(Animal):
@@ -98,14 +132,24 @@ def initialize():
 
     for i in range(14):
         wall = Boundary("Wall")
+        pen = Boundary("Pen")
         GAME_BOARD.register(wall)
-        GAME_BOARD.set_el(i, 0, wall)
+        GAME_BOARD.register(pen)
+        if i < 9:
+            GAME_BOARD.set_el(i, 0, wall)
+        else:
+            GAME_BOARD.set_el(i, 0, pen)
         GAME_BOARD.set_el(i, 9, wall)
     for i in range(10):
         wall = Boundary("Wall")
+        pen = Boundary("Pen")
         GAME_BOARD.register(wall)
+        GAME_BOARD.register(pen)
+        if i < 5:
+            GAME_BOARD.set_el(13, i, pen)
+        else:
+            GAME_BOARD.set_el(13, i, wall)
         GAME_BOARD.set_el(0, i, wall)
-        GAME_BOARD.set_el(13, i, wall)
     for i in range(1, 5):
         pen = Boundary("Pen")
         GAME_BOARD.register(pen)
@@ -118,7 +162,8 @@ def initialize():
             (2,1),
             (1,2),
             (3,2),
-            (2,3)
+            (8,3),
+            (10, 7)
         ]
     rocks = []
     for pos in rock_positions:
@@ -138,14 +183,15 @@ def initialize():
     GAME_BOARD.set_el(2, 2, PLAYER)
     print PLAYER
 
-    GAME_BOARD.draw_msg("This game is wicked awesome.")
-    gem = Gem()
-    GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(3, 1, gem)
+    keeper = Zoo_Keeper()
+    GAME_BOARD.register(keeper)
+    GAME_BOARD.set_el(11, 3, keeper)
 
-    giraffe = Giraffe("beh")
-    GAME_BOARD.register(giraffe)
-    GAME_BOARD.set_el(5,5, giraffe)
+    GAME_BOARD.draw_msg("I wonder what happens if I talk to someone. I see a baby animal specialist over there! He looks worried....")
+
+    # giraffe = Giraffe("beh")
+    # GAME_BOARD.register(giraffe)
+    # GAME_BOARD.set_el(5,5, giraffe)
 
 def keyboard_handler():
     direction = None
@@ -175,7 +221,3 @@ def keyboard_handler():
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
 
-def return_animal(creature):
-    GAME_BOARD.draw_msg("You are almost done. Press \'Enter\' or \'Return\' to place %s back in the pen" % creature)
-    if KEYBOARD[key.ENTER]:
-        GAME_BOARD.set_el(PLAYER.x - 1, PLAYER.y, creature)
