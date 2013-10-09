@@ -41,7 +41,7 @@ def setup_images():
             "Horns": "Character Horn Girl.png",
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
-            "Pig": "Character Cat Girl.png", 
+            "Pig": "coin_pig.jpg", 
             "Pen" : "Dirt Block.png",
             "Giraffe": "giraffe.png",
             "Monkey": "monkey.png",
@@ -82,7 +82,7 @@ class Board(object):
             else:
                 row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
                 game_map.append(row)
-        
+
 
         
         self.base_board = game_map

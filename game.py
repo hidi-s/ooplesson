@@ -56,30 +56,39 @@ class Zoo_Keeper(GameElement):
             GAME_BOARD.draw_msg("I'm missing my %s! Please help me find him!" %core.level[core.level["lvl"]])
             if core.level[core.level["lvl"]] == "giraffe":
                 create_map("map1.txt")
-            if core.level[core.level["lvl"]] == "monkey":
+            elif core.level[core.level["lvl"]] == "monkey":
                 create_map("map2.txt")
         elif len(PLAYER.animals) == 1:
             GAME_BOARD.draw_msg("I see you've found my %s."  %core.level[core.level["lvl"]])
             PLAYER.animals.pop(0) 
             if core.level[core.level["lvl"]] == "giraffe":
                 create_map("map1.5.txt")
+            elif core.level[core.level["lvl"]] == "monkey":
+                create_map("map2.5.txt")
             core.level["lvl"] += 1 
 
 
 class Animal(GameElement):
     def __init__(self):
         GameElement.__init__(self)
+        self.Animal = animal 
 
-    def make_noise(self, noise, animal):
-        GAME_BOARD.draw_msg("\"%s\", says the %s." % noise, animal)
-        pass
 
-    def interact(self, PLAYER):
-        # GAME_BOARD.draw_msg("You are almost done. Press \'Enter\' or \'Return\' to place %s back in the pen" % creature)
-        # if KEYBOARD[key.ENTER]:            
-        #     GAME_BOARD.set_el(PLAYER.x - 1, PLAYER.y, creature)
-        PLAYER.animals.append(self)
-        GAME_BOARD.draw_msg("You just found our giraffe. Please return him to the baby animal specialist!")
+
+    # def interact(self, PLAYER):
+    #     # GAME_BOARD.draw_msg("You are almost done. Press \'Enter\' or \'Return\' to place %s back in the pen" % creature)
+    #     # if KEYBOARD[key.ENTER]:            
+    #     #     GAME_BOARD.set_el(PLAYER.x - 1, PLAYER.y, creature)
+    #     PLAYER.animals.append(self)
+    #     if self.animal == "giraffe":
+    #         GAME_BOARD.draw_msg("You just found the %s. Please return it to the baby animal specialist!" %self.animal)
+    #     elif self.animal == "monkey":
+    #         if len(PLAYER.inventory) < 2:
+    #             make_noise("'EEK! EEEK!' I think it's hungry", monkey)
+    #         elif len(PLAYER.inventory) == 2:
+    #             self.animal.SOLID = False
+    #             GAME_BOARD.draw_msg("You give up the 2 bananas to the hungry monkey. He comes with you willingly.")
+    #             PLAYER.inventory[0:] = []
 
     # def interact(gate)
 
@@ -96,17 +105,38 @@ class Giraffe(Animal):
 
     def __init__(self, noise, animal = "Giraffe"):
         self.noise = noise
+        self.animal = animal
+    
+    def interact(self, PLAYER):
+        PLAYER.animals.append(self)
+        GAME_BOARD.draw_msg("You just found the %s. Please return it to the baby animal specialist!" %self.animal)
 
 class Monkey(Animal):
     IMAGE = "Monkey"
     SOLID = True
 
     def __init__(self, noise, animal = "Monkey"):
-        self.noise = noise 
+        self.noise = noise
+        self.animal = animal 
+    def interact(self, PLAYER):
+        if len(PLAYER.inventory) == 0:
+            GAME_BOARD.draw_msg("'EEK! EEEK!' I think it's hungry")
+        elif len(PLAYER.inventory) == 1:
+            GAME_BOARD.draw_msg("'EEK! EEEK!' I think it wants one more banana.")
+        elif len(PLAYER.inventory) == 2:
+            self.SOLID = False
+            PLAYER.animals.append(self)
+            GAME_BOARD.draw_msg("You give up the 2 bananas to the hungry monkey. He comes with you willingly.")
+            PLAYER.inventory[0:] = []
+
+
      
 class Banana(GameElement):
     IMAGE = "Banana"
     SOLID = False
+
+    def __init__(self, name = "banana"):
+        self.name = name
 
     def interact(self, player):
         player.inventory.append(self)
@@ -221,6 +251,11 @@ def create_map(textfile):
                 tree = Tree()
                 GAME_BOARD.register(tree)
                 GAME_BOARD.set_el(x, y, tree)
+            elif ord(map_positions[y][x]) == ord("W"):
+                pig = Pig("Oink!")
+                GAME_BOARD.register(pig)
+                GAME_BOARD.set_el(x, y, pig)
+
             # elif ord(map_positions[y][x]) == ord("."):
             #     PLAYER = Character()
             #     GAME_BOARD.register(PLAYER)
